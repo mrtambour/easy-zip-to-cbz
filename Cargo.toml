@@ -1,0 +1,15 @@
+[package]
+name = "easy-zip-to-cbz"
+version = "0.1.0"
+authors = ["mrtambour <6724649+mrtambour@users.noreply.github.com>"]
+edition = "2018"
+
+[dependencies]
+
+
+[profile.dev]
+opt-level = 0
+
+[profile.release]
+opt-level = 2
+lto = true
