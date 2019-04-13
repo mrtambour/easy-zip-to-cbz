@@ -1,8 +1,8 @@
 <h1>Easy ZIP to CBZ</h1>
 
-Quickly Rename a folder full of ZIP archives to CBZ for use in Comic Reading Applications and Devices.
+Quickly Rename all of the ZIP archives in a folder to CBZ for use in Comic Reading Applications and Devices.
 
-Simply drop the executable file in a folder of your choice and run it. It will rename all your ZIP archives to CBZ. 
+Simply drop the executable file inside a folder of your choice and run it. It will rename all your ZIP archives to CBZ. 
 
 
 <h3> Requirements </h3>
