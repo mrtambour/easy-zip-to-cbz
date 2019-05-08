@@ -20,14 +20,24 @@ fn main() {
         }
     }
 
+    let leave_original_file = true;
+    println!(
+        "Would you like to leave the original file? /n Currently set to: {}",
+        leave_original_file.to_string() // accept input
+    );
     for archive in archives_list {
-        println!("started for archive loop");
+        println!("Processing: {}", archive.to_string());
         let mut archive_name = archive.to_string();
         let original_file_name = archive.to_string();
         let archive_name_length = archive_name.len();
         archive_name.truncate(archive_name_length - 4);
         archive_name = format!("{}{}", archive_name, ".cbz");
         println!("Truncated archive name: {}", archive_name);
-        fs::rename(original_file_name, archive_name).expect("error renaming a file");
+
+        if leave_original_file == true {
+            fs::copy(original_file_name, archive_name);
+        } else if leave_original_file == false {
+            fs::rename(original_file_name, archive_name).expect("error renaming a file");
+        }
     }
 }
