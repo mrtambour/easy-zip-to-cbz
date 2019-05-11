@@ -1,4 +1,4 @@
-use std::{env, fs};
+use std::{env, fs, io};
 
 fn main() {
     let current_path = env::current_dir().expect("error getting current directory");
@@ -22,9 +22,21 @@ fn main() {
 
     let leave_original_file = true;
     println!(
-        "Would you like to leave the original file? /n Currently set to: {}",
+        "Would you like to leave the original file? Y/N /n Currently set to: {}",
         leave_original_file.to_string() // accept input
     );
+
+    let mut input = String::new();
+    match io::stdin().read_line(&mut input) {
+        Ok(n) => {
+            println!("Setting to {} ", input);
+            if input == "N" {
+                *leave_original_file = false;
+            }
+        }
+        Err(error) => println!("error: {}", error),
+    }
+
     for archive in archives_list {
         println!("Processing: {}", archive.to_string());
         let mut archive_name = archive.to_string();
@@ -38,6 +50,7 @@ fn main() {
             fs::copy(original_file_name, archive_name);
         } else if leave_original_file == false {
             fs::rename(original_file_name, archive_name).expect("error renaming a file");
+            println!("deleted original");
         }
     }
 }
