@@ -4,6 +4,8 @@ Quickly Rename all of the ZIP archives in a folder to CBZ for use in Comic Readi
 
 Simply drop the executable file inside a folder of your choice and run it. It will rename all your ZIP archives to CBZ. 
 
+Programmed in Rust
+
 
 <h3> Requirements </h3>
 
