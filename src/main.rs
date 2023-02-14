@@ -21,16 +21,18 @@ fn scan_directory(current_dir: &String) -> Vec<String> {
 fn get_input() -> bool {
     let mut leave_original_file = true;
     let mut input = String::new();
-
-    println!(
-        "Would you like to leave the original file? Y/N /n Currently set to: {}",
-        leave_original_file
-    );
+    println!("By default original files are kept");
+    println!("Would you like to leave the original files? Y/N");
 
     match io::stdin().read_line(&mut input) {
         Ok(_ok) => {
-            if input == "N" {
+            if input.to_uppercase().trim() == "N" {
                 leave_original_file = false;
+                println!("original files will not be kept")
+            } else if input.to_uppercase().trim() == "Y" {
+                println!("original files will be kept")
+            } else {
+                println!("invalid input detected");
             }
         }
         Err(error) => println!("error: {}", error)
