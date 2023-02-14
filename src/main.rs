@@ -60,10 +60,16 @@ fn process_zip_files(archive_list: Vec<String>, leave_original_file: bool) {
         println!("Truncated archive name: {}", archive_name);
 
         if leave_original_file {
-            fs::copy(original_file_name, archive_name).unwrap();
+            match fs::copy(original_file_name, archive_name) {
+                Ok(_ok) => {}
+                Err(error) => println!("error while copying: {}", error)
+            }
         } else if !leave_original_file {
-            fs::rename(original_file_name, archive_name).expect("error renaming a file");
-            println!("deleted original");
+            match fs::rename(original_file_name, archive_name) {
+                Ok(_ok) => {}
+                Err(error) => println!("error while renaming archive: {}", error)
+            }
+            println!("original file removed");
         }
     }
 }
