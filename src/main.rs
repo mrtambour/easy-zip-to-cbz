@@ -65,28 +65,29 @@ fn get_current_directory() -> String {
 }
 
 fn process_zip_files(archive_list: Vec<String>, leave_original_file: bool) {
+    println!("there are: {} archives to process", archive_list.len());
+
     for archive in archive_list {
-        println!("Processing: {}", archive);
-        let mut archive_name = archive.to_string();
-        let original_file_name = archive.to_string();
-        let archive_name_length = archive_name.len();
-        archive_name.truncate(archive_name_length - 4);
-        archive_name = format!("{}{}", archive_name, ".cbz");
-        println!("Truncated archive name: {}", archive_name);
+        let original_archive_name = archive.clone();
+        let mut new_archive_name = archive.clone();
+        new_archive_name.truncate(new_archive_name.len() - 4);
+        new_archive_name = format!("{}{}", new_archive_name, ".cbz");
+        println!("new archive name: {new_archive_name}");
 
         if leave_original_file {
-            match fs::copy(original_file_name, archive_name) {
+            match fs::copy(original_archive_name, new_archive_name) {
                 Ok(_ok) => {}
-                Err(error) => println!("error while copying: {}", error)
+                Err(error) => println!("error while copying: {error}")
             }
         } else if !leave_original_file {
-            match fs::rename(original_file_name, archive_name) {
+            match fs::rename(original_archive_name, new_archive_name) {
                 Ok(_ok) => {}
-                Err(error) => println!("error while renaming archive: {}", error)
+                Err(error) => println!("error while renaming archive: {error}")
             }
             println!("original file removed");
         }
     }
+    println!("done processing archives");
 }
 
 fn main() {
