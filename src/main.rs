@@ -2,8 +2,8 @@ use std::{env, fs, io};
 
 fn scan_directory(current_dir: &String) -> Vec<String> {
     let mut archives_list = vec![];
-    for entry in fs::read_dir(current_dir).expect("error reading current directory") {
-        let entries = entry.expect("error copying entry variable");
+    for entry in fs::read_dir(current_dir).expect("error occurred while trying to scan directory") {
+        let entries = entry.expect("error adding file name to list");
         let file_name = entries
             .file_name()
             .to_str()
