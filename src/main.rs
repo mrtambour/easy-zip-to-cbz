@@ -18,31 +18,44 @@ fn scan_directory(current_dir: &String) -> Vec<String> {
     archives_list
 }
 
-fn get_input() -> bool {
+fn get_input() -> (bool, bool) {
     let mut leave_original_file = true;
     let mut input = String::new();
+    let mut choice_made = false;
+    let mut exit = false;
     println!("By default original files are kept");
+    println!("You can exit by entering E");
     println!("Would you like to leave the original files? Y/N");
 
-    match io::stdin().read_line(&mut input) {
-        Ok(_ok) => {
-            if input.to_uppercase().trim() == "N" {
-                leave_original_file = false;
-                println!("original files will not be kept")
-            } else if input.to_uppercase().trim() == "Y" {
-                println!("original files will be kept")
-            } else {
-                println!("invalid input detected");
+    while !exit & !choice_made {
+        match io::stdin().read_line(&mut input) {
+            Ok(_ok) => {
+                if input.to_uppercase().trim() == "N" {
+                    leave_original_file = false;
+                    choice_made = true;
+                    println!("original files will not be kept");
+                } else if input.to_uppercase().trim() == "Y" {
+                    println!("original files will be kept");
+                    choice_made = true;
+                } else if input.to_uppercase().trim() == "E" {
+                    exit = true;
+                } else {
+                    input.clear();
+                    println!("invalid input detected");
+                    println!("Would you like to leave the original files? Y/N");
+                }
+            }
+            Err(error) => {
+                println!("error while reading input: {}", error);
+                exit = true;
             }
         }
-        Err(error) => println!("error: {}", error)
     }
-    leave_original_file
+    (leave_original_file, exit)
 }
 
 fn get_current_directory() -> String {
     let current_path = env::current_dir().expect("error getting current directory");
-
     let current_dir = current_path
         .into_os_string()
         .into_string()
@@ -77,11 +90,13 @@ fn process_zip_files(archive_list: Vec<String>, leave_original_file: bool) {
 }
 
 fn main() {
-    let leave_original_file = get_input();
+    let (leave_original_file, exit_program) = get_input();
     let current_directory = get_current_directory();
     let archive_list = scan_directory(&current_directory);
 
-    if archive_list.is_empty() {
+    if exit_program {
+        println!("program exiting")
+    } else if archive_list.is_empty() {
         println!("no archives detected")
     } else {
         process_zip_files(archive_list, leave_original_file);
