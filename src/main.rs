@@ -1,5 +1,26 @@
 use std::{env, fs, io};
 
+use simple_config_parser::Config;
+
+struct ConfigSettings {
+    setting_file_exists: bool,
+    leave_original_file: bool,
+    folder_for_each_archive: bool,
+    exit: bool,
+}
+
+impl ConfigSettings {
+    fn new(setting_file_exists: bool) -> ConfigSettings {
+        ConfigSettings {
+            setting_file_exists,
+            leave_original_file: true,
+            folder_for_each_archive: false,
+            exit: false,
+        }
+    }
+}
+
+
 fn scan_directory(current_dir: &String) -> Vec<String> {
     let mut archives_list = vec![];
     for entry in fs::read_dir(current_dir).expect("error occurred while trying to scan directory") {
