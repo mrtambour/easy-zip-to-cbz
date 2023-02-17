@@ -3,21 +3,36 @@ use std::{env, fs, io};
 use simple_config_parser::Config;
 
 struct ConfigSettings {
-    setting_file_exists: bool,
+    config_file_exists: bool,
     leave_original_file: bool,
     folder_for_each_archive: bool,
     exit: bool,
 }
 
 impl ConfigSettings {
-    fn new(setting_file_exists: bool) -> ConfigSettings {
+    fn new(config_file_exists: bool) -> ConfigSettings {
         ConfigSettings {
-            setting_file_exists,
+            config_file_exists,
             leave_original_file: true,
             folder_for_each_archive: false,
             exit: false,
         }
     }
+}
+
+fn get_settings() -> ConfigSettings {
+    let config_file_result = Config::new()
+        .file("config.txt");
+
+    let config_file = match config_file_result {
+        Ok(_ok) => {
+            ConfigSettings::new(true)
+        }
+        Err(error) => {
+            ConfigSettings::new(false)
+        }
+    };
+    config_file
 }
 
 
