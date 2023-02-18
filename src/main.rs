@@ -23,21 +23,25 @@ impl ConfigSettings {
 fn get_settings() -> ConfigSettings {
     let config_file_result = Config::new()
         .file("config.txt");
+    if config_file_result.is_err() {
+        ConfigSettings::new(false)
+    } else {
+        let config_file = config_file_result.unwrap();
+        let leave_original_file = config_file.get::<bool>("leave-original-file").unwrap();
+        let folder_for_each_archive = config_file.get::<bool>("folder-for-each-archive").unwrap();
 
-    let config_file = match config_file_result {
-        Ok(_ok) => {
-            ConfigSettings::new(true)
+        ConfigSettings {
+            config_file_exists: true,
+            leave_original_file,
+            folder_for_each_archive,
+            exit: false,
         }
-        Err(error) => {
-            ConfigSettings::new(false)
-        }
-    };
-    config_file
+    }
 }
-
 
 fn scan_directory(current_dir: &String) -> Vec<String> {
     let mut archives_list = vec![];
+
     for entry in fs::read_dir(current_dir).expect("error occurred while trying to scan directory") {
         let entries = entry.expect("error adding file name to list");
         let file_name = entries
@@ -50,7 +54,6 @@ fn scan_directory(current_dir: &String) -> Vec<String> {
             archives_list.push(file_name);
         }
     }
-
     archives_list
 }
 
@@ -92,15 +95,13 @@ fn get_input() -> (bool, bool) {
 
 fn get_current_directory() -> String {
     let current_path = env::current_dir().expect("error getting current directory");
-    let current_dir = current_path
+    current_path
         .into_os_string()
         .into_string()
-        .expect("error converting current path to string");
-
-    current_dir
+        .expect("error converting current path to string")
 }
 
-fn process_zip_files(archive_list: Vec<String>, leave_original_file: bool) {
+fn process_zip_files(archive_list: Vec<String>, leave_original_file: bool, folder_for_each_archive: bool) {
     println!("there are: {} archives to process", archive_list.len());
 
     for archive in archive_list {
@@ -111,31 +112,64 @@ fn process_zip_files(archive_list: Vec<String>, leave_original_file: bool) {
         println!("new archive name: {new_archive_name}");
 
         if leave_original_file {
-            match fs::copy(original_archive_name, new_archive_name) {
-                Ok(_ok) => {}
-                Err(error) => println!("error while copying: {error}")
+            if folder_for_each_archive {
+                fs::create_dir(&new_archive_name).expect("unable to create folder");
+                let final_dir_and_name = format!("{}/{}", &new_archive_name, &new_archive_name);
+                match fs::copy(original_archive_name, final_dir_and_name) {
+                    Ok(_ok) => {}
+                    Err(error) => println!("error while copying: {error}")
+                }
+            } else {
+                match fs::copy(original_archive_name, new_archive_name) {
+                    Ok(_ok) => {}
+                    Err(error) => println!("error while copying: {error}")
+                }
             }
         } else if !leave_original_file {
-            match fs::rename(original_archive_name, new_archive_name) {
-                Ok(_ok) => {}
-                Err(error) => println!("error while renaming archive: {error}")
+            if folder_for_each_archive {
+                fs::create_dir(&new_archive_name).expect("unable to create folder");
+                let final_dir_and_name = format!("{}/{}", &new_archive_name, &new_archive_name);
+                match fs::rename(original_archive_name, final_dir_and_name) {
+                    Ok(_ok) => {}
+                    Err(error) => println!("error while renaming archive: {error}")
+                }
+                println!("original file removed");
+            } else {
+                match fs::rename(original_archive_name, new_archive_name) {
+                    Ok(_ok) => {}
+                    Err(error) => println!("error while renaming archive: {error}")
+                }
+                println!("original file removed");
             }
-            println!("original file removed");
         }
     }
     println!("done processing archives");
 }
 
 fn main() {
-    let (leave_original_file, exit_program) = get_input();
-    let current_directory = get_current_directory();
-    let archive_list = scan_directory(&current_directory);
+    let config_settings = get_settings();
+    if config_settings.config_file_exists {
+        let leave_original_file = config_settings.leave_original_file;
+        let folder_for_each_archive = config_settings.folder_for_each_archive;
+        let current_directory = get_current_directory();
+        let archive_list = scan_directory(&current_directory);
 
-    if exit_program {
-        println!("program exiting")
-    } else if archive_list.is_empty() {
-        println!("no archives detected")
+        if archive_list.is_empty() {
+            println!("no archives detected")
+        } else {
+            process_zip_files(archive_list, leave_original_file, folder_for_each_archive);
+        }
     } else {
-        process_zip_files(archive_list, leave_original_file);
+        let (leave_original_file, exit_program) = get_input();
+        let current_directory = get_current_directory();
+        let archive_list = scan_directory(&current_directory);
+
+        if exit_program {
+            println!("program exiting")
+        } else if archive_list.is_empty() {
+            println!("no archives detected")
+        } else {
+            process_zip_files(archive_list, leave_original_file, false);
+        }
     }
 }
