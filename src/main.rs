@@ -108,12 +108,13 @@ fn process_zip_files(archive_list: Vec<String>, leave_original_file: bool, folde
         let original_archive_name = archive.clone();
         let mut new_archive_name = archive.clone();
         new_archive_name.truncate(new_archive_name.len() - 4);
+        let mut final_folder_name = new_archive_name.clone();
         new_archive_name = format!("{}{}", new_archive_name, ".cbz");
         println!("new archive name: {new_archive_name}");
 
         if leave_original_file {
             if folder_for_each_archive {
-                fs::create_dir(&new_archive_name).expect("unable to create folder");
+                fs::create_dir(final_folder_name).expect("unable to create folder");
                 let final_dir_and_name = format!("{}/{}", &new_archive_name, &new_archive_name);
                 match fs::copy(original_archive_name, final_dir_and_name) {
                     Ok(_ok) => {}
@@ -127,7 +128,7 @@ fn process_zip_files(archive_list: Vec<String>, leave_original_file: bool, folde
             }
         } else if !leave_original_file {
             if folder_for_each_archive {
-                fs::create_dir(&new_archive_name).expect("unable to create folder");
+                fs::create_dir(final_folder_name).expect("unable to create folder");
                 let final_dir_and_name = format!("{}/{}", &new_archive_name, &new_archive_name);
                 match fs::rename(original_archive_name, final_dir_and_name) {
                     Ok(_ok) => {}
