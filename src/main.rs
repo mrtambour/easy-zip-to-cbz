@@ -27,14 +27,18 @@ fn get_settings() -> ConfigSettings {
         ConfigSettings::new(false)
     } else {
         let config_file = config_file_result.unwrap();
-        let leave_original_file = config_file.get::<bool>("leave-original-file").unwrap();
-        let folder_for_each_archive = config_file.get::<bool>("folder-for-each-archive").unwrap();
+        let leave_original_file = config_file.get::<bool>("leave-original-file");
+        let folder_for_each_archive = config_file.get::<bool>("folder-for-each-archive");
 
-        ConfigSettings {
-            config_file_exists: true,
-            leave_original_file,
-            folder_for_each_archive,
-            exit: false,
+        if leave_original_file.is_err() | folder_for_each_archive.is_err() {
+            ConfigSettings::new(false)
+        } else {
+            ConfigSettings {
+                config_file_exists: true,
+                leave_original_file: leave_original_file.unwrap(),
+                folder_for_each_archive: folder_for_each_archive.unwrap(),
+                exit: false,
+            }
         }
     }
 }
@@ -108,7 +112,7 @@ fn process_zip_files(archive_list: Vec<String>, leave_original_file: bool, folde
         let original_archive_name = archive.clone();
         let mut new_archive_name = archive.clone();
         new_archive_name.truncate(new_archive_name.len() - 4);
-        let mut final_folder_name = new_archive_name.clone();
+        let final_folder_name = new_archive_name.clone();
         new_archive_name = format!("{}{}", new_archive_name, ".cbz");
         println!("new archive name: {new_archive_name}");
 
