@@ -118,8 +118,8 @@ fn process_zip_files(archive_list: Vec<String>, leave_original_file: bool, folde
 
         if leave_original_file {
             if folder_for_each_archive {
-                fs::create_dir(final_folder_name).expect("unable to create folder");
-                let final_dir_and_name = format!("{}/{}", &new_archive_name, &new_archive_name);
+                fs::create_dir(&final_folder_name).expect("unable to create folder");
+                let final_dir_and_name = format!("{}/{}", &final_folder_name, &new_archive_name);
                 match fs::copy(original_archive_name, final_dir_and_name) {
                     Ok(_ok) => {}
                     Err(error) => println!("error while copying: {error}")

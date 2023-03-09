@@ -1,6 +1,6 @@
 [package]
 name = "easy-zip-to-cbz"
-version = "0.5.0"
+version = "0.5.1"
 authors = ["mrtambour <6724649+mrtambour@users.noreply.github.com>"]
 edition = "2021"
 
@@ -11,5 +11,5 @@ simple_config_parser = "1.0.0"
 opt-level = 0
 
 [profile.release]
-opt-level = 2
+opt-level = 3
 lto = true
