@@ -1,3 +1,5 @@
+use std::ffi::OsString;
+use std::path::PathBuf;
 use std::{env, fs, io};
 
 use simple_config_parser::Config;
@@ -99,12 +101,8 @@ fn get_input() -> (bool, bool) {
     (leave_original_file, exit)
 }
 
-fn get_current_directory() -> String {
-    let current_path = env::current_dir().expect("error getting current directory");
-    current_path
-        .into_os_string()
-        .into_string()
-        .expect("error converting current path to string")
+fn get_current_directory() -> std::io::Result<PathBuf> {
+    env::current_dir()
 }
 
 fn process_zip_files(
