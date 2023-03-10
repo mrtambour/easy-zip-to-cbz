@@ -71,24 +71,27 @@ fn get_input() -> (bool, bool) {
 
     while !exit & !choice_made {
         match io::stdin().read_line(&mut input) {
-            Ok(_ok) => {
-                if input.to_uppercase().trim() == "N" {
+            Ok(_) => match input.to_uppercase().trim() {
+                "N" => {
                     leave_original_file = false;
-                    choice_made = true;
                     println!("original files will not be kept");
-                } else if input.to_uppercase().trim() == "Y" {
+                    choice_made = true;
+                }
+                "Y" => {
                     println!("original files will be kept");
                     choice_made = true;
-                } else if input.to_uppercase().trim() == "E" {
+                }
+                "E" => {
                     exit = true;
-                } else {
+                }
+                _ => {
                     input.clear();
                     println!("invalid input detected");
-                    println!("Would you like to leave the original files? Y/N");
+                    println!("would you like to leave the original files? Y/N");
                 }
-            }
-            Err(error) => {
-                println!("error while reading input: {}", error);
+            },
+            Err(inp_err) => {
+                println!("error while reading input: {}", inp_err);
                 exit = true;
             }
         }
