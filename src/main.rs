@@ -1,6 +1,6 @@
+use std::{env, fs, io};
 use std::ffi::OsString;
 use std::path::PathBuf;
-use std::{env, fs, io};
 
 use simple_config_parser::Config;
 
@@ -157,28 +157,47 @@ fn process_zip_files(
 
 fn main() {
     let config_settings = get_settings();
+
     if config_settings.config_file_exists {
         let leave_original_file = config_settings.leave_original_file;
         let folder_for_each_archive = config_settings.folder_for_each_archive;
-        let current_directory = get_current_directory();
-        let archive_list = scan_directory(&current_directory);
 
-        if archive_list.is_empty() {
-            println!("no archives detected")
-        } else {
-            process_zip_files(archive_list, leave_original_file, folder_for_each_archive);
+        match get_current_directory() {
+            Ok(current_directory) => {
+                let archive_list = scan_directory(current_directory);
+
+                if archive_list.is_empty() {
+                    println!("no archives detected")
+                } else {
+                    process_zip_files(archive_list, leave_original_file, folder_for_each_archive);
+                }
+            }
+            Err(error) => {
+                println!("encountered error while trying to get current directory");
+                println!("error: {error}");
+            }
         }
     } else {
         let (leave_original_file, exit_program) = get_input();
-        let current_directory = get_current_directory();
-        let archive_list = scan_directory(&current_directory);
 
         if exit_program {
-            println!("program exiting")
-        } else if archive_list.is_empty() {
-            println!("no archives detected")
-        } else {
-            process_zip_files(archive_list, leave_original_file, false);
+            return;
+        }
+
+        match get_current_directory() {
+            Ok(current_directory) => {
+                let archive_list = scan_directory(current_directory);
+
+                if archive_list.is_empty() {
+                    println!("no archives detected")
+                } else {
+                    process_zip_files(archive_list, leave_original_file, folder_for_each_archive);
+                }
+            }
+            Err(error) => {
+                println!("encountered error while trying to get current directory");
+                println!("error: {error}");
+            }
         }
     }
 }
