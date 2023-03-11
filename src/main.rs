@@ -44,7 +44,7 @@ fn get_settings() -> ConfigSettings {
     }
 }
 
-fn scan_directory(current_dir: &String) -> Vec<String> {
+fn scan_directory(current_dir: PathBuf) -> Vec<String> {
     let mut archives_list = vec![];
 
     for entry in fs::read_dir(current_dir).expect("error occurred while trying to scan directory") {
@@ -191,7 +191,7 @@ fn main() {
                 if archive_list.is_empty() {
                     println!("no archives detected")
                 } else {
-                    process_zip_files(archive_list, leave_original_file, folder_for_each_archive);
+                    process_zip_files(archive_list, leave_original_file, false);
                 }
             }
             Err(error) => {
